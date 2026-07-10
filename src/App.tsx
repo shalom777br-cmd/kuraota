@@ -219,20 +219,37 @@ export default function App() {
               </button>
             ) : (
               <div className="flex items-center gap-3 bg-stone-900/40 border border-stone-850 px-4 py-2 rounded-2xl max-w-xs">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  referrerPolicy="no-referrer"
-                  className="w-8 h-8 rounded-full border border-yellow-200/20 object-cover"
-                />
-                <div className="hidden sm:block text-left">
-                  <span className="text-3xs font-semibold text-yellow-200/90 flex items-center gap-1 uppercase tracking-wider">
+                {/* Clickable Avatar to Dashboard */}
+                <button
+                  onClick={() => setActiveTab("dashboard")}
+                  className="relative group focus:outline-none flex-shrink-0"
+                  title="マイ・サロン (Supabaseダッシュボード) を開く"
+                >
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    referrerPolicy="no-referrer"
+                    className="w-8 h-8 rounded-full border border-yellow-200/20 object-cover group-hover:scale-105 group-hover:border-yellow-200/60 transition duration-200"
+                  />
+                  <div className="absolute -bottom-1 -right-1 bg-yellow-100 text-stone-950 rounded-full p-0.5 shadow-md shadow-black/40 group-hover:scale-110 transition duration-200">
+                    <Layout className="w-2.5 h-2.5" />
+                  </div>
+                </button>
+
+                {/* Clickable User Information to Dashboard */}
+                <button
+                  onClick={() => setActiveTab("dashboard")}
+                  className="hidden sm:block text-left focus:outline-none group/text"
+                  title="マイ・サロン (Supabaseダッシュボード) を開く"
+                >
+                  <span className="text-3xs font-semibold text-yellow-200/90 flex items-center gap-1 uppercase tracking-wider group-hover/text:text-yellow-100 transition">
                     <Award className="w-3 h-3" />
                     {user.role}
                   </span>
-                  <span className="text-xs text-stone-200 font-medium truncate block">{user.name}</span>
-                </div>
-                <div className="flex items-center gap-1.5 ml-2 border-l border-stone-800 pl-2">
+                  <span className="text-xs text-stone-200 font-medium truncate block max-w-[120px] group-hover/text:text-yellow-100 transition">{user.name}</span>
+                </button>
+
+                <div className="flex items-center gap-1.5 ml-1 border-l border-stone-800 pl-2">
                   <button
                     onClick={() => setIsAuthOpen(true)}
                     className="text-[10px] text-stone-400 hover:text-stone-200 transition"
