@@ -1,0 +1,6 @@
+{
+  "name": "L'harmonie Classique",
+  "description": "クラシック音楽ファンのためのSNS。好きな作曲家、行ったコンサートのレヴュー、これから行きたいコンサート情報などを共有・交流でき、AIによる執筆支援や名曲推薦も受けられます。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
