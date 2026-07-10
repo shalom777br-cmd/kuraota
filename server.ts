@@ -60,7 +60,7 @@ app.post("/api/recommendations", async (req, res) => {
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: userPrompt,
       config: {
         systemInstruction,
@@ -119,7 +119,7 @@ app.post("/api/review-helper", async (req, res) => {
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: userPrompt,
       config: {
         systemInstruction,
@@ -165,7 +165,7 @@ app.post("/api/composer-info", async (req, res) => {
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: `Composer: ${composerName}`,
       config: {
         systemInstruction,
