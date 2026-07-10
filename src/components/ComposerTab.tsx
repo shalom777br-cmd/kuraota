@@ -7,9 +7,10 @@ interface ComposerTabProps {
   user: User;
   onToggleFavorite: (composerId: string) => void;
   onAddComposer: (newComposer: Composer) => void;
+  onRequireAuth?: () => void;
 }
 
-export default function ComposerTab({ composers, user, onToggleFavorite, onAddComposer }: ComposerTabProps) {
+export default function ComposerTab({ composers, user, onToggleFavorite, onAddComposer, onRequireAuth }: ComposerTabProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedComposer, setSelectedComposer] = useState<Composer | null>(null);
   
@@ -120,7 +121,13 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
         </div>
         
         <button
-          onClick={() => setShowAddForm(true)}
+          onClick={() => {
+            if (user.id === "guest-user") {
+              onRequireAuth?.();
+            } else {
+              setShowAddForm(true);
+            }
+          }}
           className="flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 border border-yellow-200/20 hover:bg-stone-850 text-yellow-100/90 font-medium text-xs rounded-xl transition duration-200 shadow-lg shadow-black/20"
         >
           <Plus className="w-4 h-4" />
@@ -313,7 +320,11 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onToggleFavorite(c.id);
+                          if (user.id === "guest-user") {
+                            onRequireAuth?.();
+                          } else {
+                            onToggleFavorite(c.id);
+                          }
                         }}
                         className={`p-1 rounded-full hover:bg-stone-800 transition ${
                           isFavorite ? "text-rose-500" : "text-stone-500"
@@ -408,7 +419,13 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
               </div>
 
               <button
-                onClick={() => onToggleFavorite(selectedComposer.id)}
+                onClick={() => {
+                  if (user.id === "guest-user") {
+                    onRequireAuth?.();
+                  } else {
+                    onToggleFavorite(selectedComposer.id);
+                  }
+                }}
                 className={`w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition duration-200 ${
                   user.favoriteComposers.includes(selectedComposer.id)
                     ? "bg-rose-950/40 hover:bg-rose-950/60 border border-rose-500/40 text-rose-300"

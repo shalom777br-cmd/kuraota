@@ -6,7 +6,9 @@ import ReviewTab from "./components/ReviewTab";
 import ConcertTab from "./components/ConcertTab";
 import CommunityTab from "./components/CommunityTab";
 import ConciergeTab from "./components/ConciergeTab";
-import { Music, Calendar, BookOpen, MessageSquare, Compass, Sparkles, Heart, Award, CheckCircle } from "lucide-react";
+import DashboardTab from "./components/DashboardTab";
+import AuthModal from "./components/AuthModal";
+import { Music, Calendar, BookOpen, MessageSquare, Compass, Sparkles, Heart, Award, CheckCircle, LogIn, LogOut, Layout } from "lucide-react";
 
 export default function App() {
   // Load state from local storage or fallback to defaults
@@ -35,7 +37,22 @@ export default function App() {
     return saved ? JSON.parse(saved) : INITIAL_POSTS;
   });
 
-  const [activeTab, setActiveTab] = useState<"composers" | "reviews" | "concerts" | "community" | "concierge">("composers");
+  const [activeTab, setActiveTab] = useState<"composers" | "reviews" | "concerts" | "community" | "concierge" | "dashboard">("composers");
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  const handleLogout = () => {
+    setUser({
+      id: "guest-user",
+      name: "ゲスト愛好家",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120",
+      role: "ログインして全ての機能を利用",
+      favoriteComposers: []
+    });
+  };
+
+  const handleLoginSuccess = (loggedInUser: User) => {
+    setUser(loggedInUser);
+  };
 
   // Save state to local storage when changed
   useEffect(() => {
@@ -191,20 +208,48 @@ export default function App() {
           </div>
 
           {/* User Status Card */}
-          <div className="flex items-center gap-3 bg-stone-900/40 border border-stone-850 px-4 py-2 rounded-2xl max-w-xs">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              referrerPolicy="no-referrer"
-              className="w-8 h-8 rounded-full border border-yellow-200/20 object-cover"
-            />
-            <div className="hidden sm:block text-left">
-              <span className="text-3xs font-semibold text-yellow-200/90 flex items-center gap-1 uppercase tracking-wider">
-                <Award className="w-3 h-3" />
-                {user.role}
-              </span>
-              <span className="text-xs text-stone-200 font-medium truncate block">{user.name}</span>
-            </div>
+          <div className="flex items-center gap-3">
+            {user.id === "guest-user" ? (
+              <button
+                onClick={() => setIsAuthOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-850 border border-yellow-200/20 text-yellow-100/90 font-serif font-medium text-xs rounded-xl transition duration-200 shadow-md shadow-black/20"
+              >
+                <LogIn className="w-3.5 h-3.5 text-yellow-200/80" />
+                ログイン / 登録
+              </button>
+            ) : (
+              <div className="flex items-center gap-3 bg-stone-900/40 border border-stone-850 px-4 py-2 rounded-2xl max-w-xs">
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  referrerPolicy="no-referrer"
+                  className="w-8 h-8 rounded-full border border-yellow-200/20 object-cover"
+                />
+                <div className="hidden sm:block text-left">
+                  <span className="text-3xs font-semibold text-yellow-200/90 flex items-center gap-1 uppercase tracking-wider">
+                    <Award className="w-3 h-3" />
+                    {user.role}
+                  </span>
+                  <span className="text-xs text-stone-200 font-medium truncate block">{user.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5 ml-2 border-l border-stone-800 pl-2">
+                  <button
+                    onClick={() => setIsAuthOpen(true)}
+                    className="text-[10px] text-stone-400 hover:text-stone-200 transition"
+                    title="アカウントを切り替える"
+                  >
+                    切替
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="text-stone-400 hover:text-red-400 p-1 rounded-lg transition"
+                    title="ログアウトする"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
@@ -252,6 +297,7 @@ export default function App() {
             { id: "concerts", label: "コンサート日程", icon: Calendar },
             { id: "community", label: "交流サロン (掲示板)", icon: Music },
             { id: "concierge", label: "AI コンシェルジュ", icon: Compass },
+            { id: "dashboard", label: "マイ・サロン (Supabase)", icon: Layout },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -280,6 +326,7 @@ export default function App() {
               user={user}
               onToggleFavorite={handleToggleFavoriteComposer}
               onAddComposer={handleAddComposer}
+              onRequireAuth={() => setIsAuthOpen(true)}
             />
           )}
 
@@ -289,6 +336,7 @@ export default function App() {
               user={user}
               onAddReview={handleAddReview}
               onLikeReview={handleLikeReview}
+              onRequireAuth={() => setIsAuthOpen(true)}
             />
           )}
 
@@ -298,6 +346,7 @@ export default function App() {
               user={user}
               onToggleInterest={handleToggleInterestConcert}
               onAddConcert={handleAddConcert}
+              onRequireAuth={() => setIsAuthOpen(true)}
             />
           )}
 
@@ -308,11 +357,22 @@ export default function App() {
               onAddPost={handleAddPost}
               onLikePost={handleLikePost}
               onAddComment={handleAddComment}
+              onRequireAuth={() => setIsAuthOpen(true)}
             />
           )}
 
           {activeTab === "concierge" && (
             <ConciergeTab onAddReviewDraft={handleConciergeReviewDraftTransition} />
+          )}
+
+          {activeTab === "dashboard" && (
+            <DashboardTab
+              user={user}
+              composers={composers}
+              concerts={concerts}
+              posts={posts}
+              onRequireAuth={() => setIsAuthOpen(true)}
+            />
           )}
         </div>
 
@@ -325,6 +385,13 @@ export default function App() {
           <p className="text-[10px] text-stone-700">芸術と和声が響きあう、美しいコミュニティのために</p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 }

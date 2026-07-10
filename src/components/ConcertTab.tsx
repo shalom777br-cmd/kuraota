@@ -7,9 +7,10 @@ interface ConcertTabProps {
   user: User;
   onToggleInterest: (concertId: string) => void;
   onAddConcert: (concert: UpcomingConcert) => void;
+  onRequireAuth?: () => void;
 }
 
-export default function ConcertTab({ concerts, user, onToggleInterest, onAddConcert }: ConcertTabProps) {
+export default function ConcertTab({ concerts, user, onToggleInterest, onAddConcert, onRequireAuth }: ConcertTabProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [title, setTitle] = useState("");
   const [composer, setComposer] = useState("");
@@ -74,7 +75,13 @@ export default function ConcertTab({ concerts, user, onToggleInterest, onAddConc
         </div>
         
         <button
-          onClick={() => setShowAddForm(true)}
+          onClick={() => {
+            if (user.id === "guest-user") {
+              onRequireAuth?.();
+            } else {
+              setShowAddForm(true);
+            }
+          }}
           className="flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 border border-yellow-200/20 hover:bg-stone-850 text-yellow-100/90 font-medium text-xs rounded-xl transition duration-200 shadow-lg shadow-black/20"
         >
           <Plus className="w-4 h-4" />
@@ -288,7 +295,13 @@ export default function ConcertTab({ concerts, user, onToggleInterest, onAddConc
                       </a>
                     )}
                     <button
-                      onClick={() => onToggleInterest(c.id)}
+                      onClick={() => {
+                        if (user.id === "guest-user") {
+                          onRequireAuth?.();
+                        } else {
+                          onToggleInterest(c.id);
+                        }
+                      }}
                       className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 text-3xs font-semibold rounded-xl transition duration-200 ${
                         isInterested
                           ? "bg-yellow-200/10 text-yellow-100 border border-yellow-200/40 font-bold"

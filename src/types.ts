@@ -79,6 +79,18 @@ export interface Comment {
   createdAt: string;
 }
 
+export interface UserDashboard {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  title: string;
+  theme: string;
+  widgets: string[];
+  scratchpadText?: string;
+  createdAt: string;
+}
+
 export interface MusicRecommendation {
   title: string;
   composer: string;

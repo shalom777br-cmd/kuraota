@@ -7,9 +7,10 @@ interface ReviewTabProps {
   user: User;
   onAddReview: (review: ConcertReview) => void;
   onLikeReview: (reviewId: string) => void;
+  onRequireAuth?: () => void;
 }
 
-export default function ReviewTab({ reviews, user, onAddReview, onLikeReview }: ReviewTabProps) {
+export default function ReviewTab({ reviews, user, onAddReview, onLikeReview, onRequireAuth }: ReviewTabProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   
@@ -120,7 +121,13 @@ export default function ReviewTab({ reviews, user, onAddReview, onLikeReview }: 
         </div>
         
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            if (user.id === "guest-user") {
+              onRequireAuth?.();
+            } else {
+              setShowAddModal(true);
+            }
+          }}
           className="flex items-center justify-center gap-2 px-5 py-2.5 bg-stone-900 border border-yellow-200/20 hover:bg-stone-850 text-yellow-100/90 font-semibold text-xs rounded-xl transition duration-200 shadow-lg shadow-black/20"
         >
           <Plus className="w-4 h-4" />
@@ -184,7 +191,13 @@ export default function ReviewTab({ reviews, user, onAddReview, onLikeReview }: 
             {/* Social footer */}
             <div className="flex items-center justify-between border-t border-stone-800/80 pt-4 mt-4">
               <button
-                onClick={() => onLikeReview(r.id)}
+                onClick={() => {
+                  if (user.id === "guest-user") {
+                    onRequireAuth?.();
+                  } else {
+                    onLikeReview(r.id);
+                  }
+                }}
                 className={`flex items-center gap-1.5 text-3xs transition ${
                   r.hasLiked ? "text-rose-400 font-medium" : "text-stone-400 hover:text-rose-400"
                 }`}

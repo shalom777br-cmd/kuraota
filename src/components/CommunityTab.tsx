@@ -8,9 +8,10 @@ interface CommunityTabProps {
   onAddPost: (post: CommunityPost) => void;
   onLikePost: (postId: string) => void;
   onAddComment: (postId: string, comment: Comment) => void;
+  onRequireAuth?: () => void;
 }
 
-export default function CommunityTab({ posts, user, onAddPost, onLikePost, onAddComment }: CommunityTabProps) {
+export default function CommunityTab({ posts, user, onAddPost, onLikePost, onAddComment, onRequireAuth }: CommunityTabProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -45,6 +46,10 @@ export default function CommunityTab({ posts, user, onAddPost, onLikePost, onAdd
   };
 
   const handleCommentSubmit = (postId: string) => {
+    if (user.id === "guest-user") {
+      onRequireAuth?.();
+      return;
+    }
     const text = commentInputs[postId];
     if (!text || !text.trim()) return;
 
@@ -75,7 +80,13 @@ export default function CommunityTab({ posts, user, onAddPost, onLikePost, onAdd
         </div>
         
         <button
-          onClick={() => setShowAddForm(true)}
+          onClick={() => {
+            if (user.id === "guest-user") {
+              onRequireAuth?.();
+            } else {
+              setShowAddForm(true);
+            }
+          }}
           className="flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 border border-yellow-200/20 hover:bg-stone-850 text-yellow-100/90 font-medium text-xs rounded-xl transition duration-200 shadow-lg shadow-black/20"
         >
           <Plus className="w-4 h-4" />
@@ -217,7 +228,13 @@ export default function CommunityTab({ posts, user, onAddPost, onLikePost, onAdd
               {/* Post Action bar */}
               <div className="flex items-center gap-4 text-3xs border-y border-stone-800/60 py-3 text-stone-500">
                 <button
-                  onClick={() => onLikePost(p.id)}
+                  onClick={() => {
+                    if (user.id === "guest-user") {
+                      onRequireAuth?.();
+                    } else {
+                      onLikePost(p.id);
+                    }
+                  }}
                   className={`flex items-center gap-1.5 transition ${
                     p.hasLiked ? "text-rose-400" : "hover:text-stone-300"
                   }`}
