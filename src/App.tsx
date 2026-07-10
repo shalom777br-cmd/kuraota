@@ -19,7 +19,30 @@ export default function App() {
 
   const [composers, setComposers] = useState<Composer[]>(() => {
     const saved = localStorage.getItem("lharmonie_composers");
-    return saved ? JSON.parse(saved) : INITIAL_COMPOSERS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasBrahms = parsed.some((c: any) => c.id === "brahms");
+        const hasDvorak = parsed.some((c: any) => c.id === "dvorak");
+        if (!hasBrahms || !hasDvorak) {
+          const merged = [...parsed];
+          if (!hasBrahms) {
+            const b = INITIAL_COMPOSERS.find(c => c.id === "brahms");
+            if (b) merged.push(b);
+          }
+          if (!hasDvorak) {
+            const d = INITIAL_COMPOSERS.find(c => c.id === "dvorak");
+            if (d) merged.push(d);
+          }
+          return merged;
+        }
+        return parsed;
+      } catch (e) {
+        console.error("Error parsing lharmonie_composers", e);
+        return INITIAL_COMPOSERS;
+      }
+    }
+    return INITIAL_COMPOSERS;
   });
 
   const [reviews, setReviews] = useState<ConcertReview[]>(() => {
@@ -127,6 +150,13 @@ export default function App() {
   // Add a newly submitted or AI-generated composer to list
   const handleAddComposer = (newComposer: Composer) => {
     setComposers((prev) => [newComposer, ...prev]);
+  };
+
+  // Edit an existing composer
+  const handleEditComposer = (updatedComposer: Composer) => {
+    setComposers((prev) =>
+      prev.map((c) => (c.id === updatedComposer.id ? updatedComposer : c))
+    );
   };
 
   // Add concert review
@@ -381,6 +411,7 @@ export default function App() {
               user={user}
               onToggleFavorite={handleToggleFavoriteComposer}
               onAddComposer={handleAddComposer}
+              onEditComposer={handleEditComposer}
               onRequireAuth={() => setIsAuthOpen(true)}
             />
           )}

@@ -1,21 +1,23 @@
 import React, { useState } from "react";
 import { Composer, User } from "../types";
-import { Search, Heart, Sparkles, BookOpen, Music, History, Plus, X, Globe, UserCheck, Loader2 } from "lucide-react";
+import { Search, Heart, Sparkles, BookOpen, Music, History, Plus, X, Globe, UserCheck, Loader2, Edit2 } from "lucide-react";
 
 interface ComposerTabProps {
   composers: Composer[];
   user: User;
   onToggleFavorite: (composerId: string) => void;
   onAddComposer: (newComposer: Composer) => void;
+  onEditComposer: (updatedComposer: Composer) => void;
   onRequireAuth?: () => void;
 }
 
-export default function ComposerTab({ composers, user, onToggleFavorite, onAddComposer, onRequireAuth }: ComposerTabProps) {
+export default function ComposerTab({ composers, user, onToggleFavorite, onAddComposer, onEditComposer, onRequireAuth }: ComposerTabProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedComposer, setSelectedComposer] = useState<Composer | null>(null);
   
   // Custom composer form state
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingComposer, setEditingComposer] = useState<Composer | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiQuery, setAiQuery] = useState("");
   const [aiError, setAiError] = useState("");
@@ -27,11 +29,19 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
   const [manualBio, setManualBio] = useState("");
   const [manualPieces, setManualPieces] = useState(["", "", ""]);
 
-  const filteredComposers = composers.filter((c) =>
-    c.nameJa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.era.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Eras for quick filtering - Default is Romantic (ロマン派)
+  const ERAS = ["すべて", "バロック", "古典派", "ロマン派", "印象主義"];
+  const [selectedEra, setSelectedEra] = useState("ロマン派");
+
+  const filteredComposers = composers.filter((c) => {
+    const matchesSearch =
+      c.nameJa.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.era.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (selectedEra === "すべて") return matchesSearch;
+    return matchesSearch && c.era.toLowerCase().includes(selectedEra.toLowerCase());
+  });
 
   const fetchComposerFromAi = async () => {
     if (!aiQuery.trim()) {
@@ -76,24 +86,54 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
     }
   };
 
+  const startEditing = (c: Composer) => {
+    setEditingComposer(c);
+    setManualName(c.nameJa);
+    setManualEra(c.era);
+    setManualCountry(c.country);
+    setManualLifespan(c.lifespan);
+    setManualBio(c.biography);
+    setManualPieces([
+      c.famousPieces?.[0] || "",
+      c.famousPieces?.[1] || "",
+      c.famousPieces?.[2] || ""
+    ]);
+    setAiQuery(c.nameEn || c.nameJa);
+    setShowAddForm(true);
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!manualName) return;
 
-    const id = manualName.toLowerCase().replace(/[^a-z0-9]/g, "-");
-    const newComp: Composer = {
-      id: id || Date.now().toString(),
-      nameJa: manualName,
-      nameEn: aiQuery || manualName,
-      era: manualEra || "不明",
-      country: manualCountry || "不明",
-      lifespan: manualLifespan || "不明",
-      biography: manualBio || "詳細データはありません。",
-      image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=300", // fallback
-      famousPieces: manualPieces.filter(p => p.trim() !== "")
-    };
-
-    onAddComposer(newComp);
+    if (editingComposer) {
+      const updatedComp: Composer = {
+        ...editingComposer,
+        nameJa: manualName,
+        nameEn: aiQuery || manualName || editingComposer.nameEn,
+        era: manualEra || "不明",
+        country: manualCountry || "不明",
+        lifespan: manualLifespan || "不明",
+        biography: manualBio || "詳細データはありません。",
+        famousPieces: manualPieces.filter(p => p.trim() !== "")
+      };
+      onEditComposer(updatedComp);
+      setSelectedComposer(updatedComp);
+    } else {
+      const id = manualName.toLowerCase().replace(/[^a-z0-9]/g, "-");
+      const newComp: Composer = {
+        id: id || Date.now().toString(),
+        nameJa: manualName,
+        nameEn: aiQuery || manualName,
+        era: manualEra || "不明",
+        country: manualCountry || "不明",
+        lifespan: manualLifespan || "不明",
+        biography: manualBio || "詳細データはありません。",
+        image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=300", // fallback
+        famousPieces: manualPieces.filter(p => p.trim() !== "")
+      };
+      onAddComposer(newComp);
+    }
     
     // reset form
     setManualName("");
@@ -103,6 +143,7 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
     setManualBio("");
     setManualPieces(["", "", ""]);
     setAiQuery("");
+    setEditingComposer(null);
     setShowAddForm(false);
   };
 
@@ -142,9 +183,15 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-serif text-yellow-100 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-yellow-200" />
-                作曲家プロフィール追加
+                {editingComposer ? "作曲家プロフィール編集" : "作曲家プロフィール追加"}
               </h3>
-              <button onClick={() => setShowAddForm(false)} className="text-stone-400 hover:text-stone-200">
+              <button
+                onClick={() => {
+                  setShowAddForm(false);
+                  setEditingComposer(null);
+                }}
+                className="text-stone-400 hover:text-stone-200"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -263,7 +310,10 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
               <div className="flex justify-end gap-3 pt-4 border-t border-stone-800">
                 <button
                   type="button"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setEditingComposer(null);
+                  }}
                   className="px-4 py-2 text-xs text-stone-400 hover:text-stone-200 transition"
                 >
                   キャンセル
@@ -272,7 +322,7 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
                   type="submit"
                   className="px-5 py-2 bg-stone-950 border border-yellow-200/20 hover:bg-stone-900 text-yellow-100/90 font-medium text-xs rounded-xl transition shadow-md shadow-black/20"
                 >
-                  ライブラリに追加する
+                  {editingComposer ? "変更を保存する" : "ライブラリに追加する"}
                 </button>
               </div>
             </form>
@@ -293,6 +343,26 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-stone-900 text-stone-100 border border-stone-800 pl-10 pr-4 py-3 text-xs rounded-xl focus:ring-1 focus:ring-yellow-200 outline-none transition"
             />
+          </div>
+
+          {/* Era Filter Tabs */}
+          <div className="flex flex-wrap gap-1.5 p-1 bg-stone-950/40 border border-stone-800/60 rounded-xl">
+            {ERAS.map((era) => {
+              const isActive = selectedEra === era;
+              return (
+                <button
+                  key={era}
+                  onClick={() => setSelectedEra(era)}
+                  className={`px-3 py-1.5 rounded-lg text-3xs font-medium transition duration-200 ${
+                    isActive
+                      ? "bg-stone-800 text-yellow-100 border border-yellow-200/10 shadow-sm"
+                      : "text-stone-400 hover:text-stone-200 hover:bg-stone-900/40 border border-transparent"
+                  }`}
+                >
+                  {era}
+                </button>
+              );
+            })}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -418,23 +488,39 @@ export default function ComposerTab({ composers, user, onToggleFavorite, onAddCo
                 </ul>
               </div>
 
-              <button
-                onClick={() => {
-                  if (user.id === "guest-user") {
-                    onRequireAuth?.();
-                  } else {
-                    onToggleFavorite(selectedComposer.id);
-                  }
-                }}
-                className={`w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition duration-200 ${
-                  user.favoriteComposers.includes(selectedComposer.id)
-                    ? "bg-rose-950/40 hover:bg-rose-950/60 border border-rose-500/40 text-rose-300"
-                    : "bg-stone-850 hover:bg-stone-800 text-yellow-100 border border-stone-700"
-                }`}
-              >
-                <Heart className="w-4 h-4" fill={user.favoriteComposers.includes(selectedComposer.id) ? "currentColor" : "none"} />
-                {user.favoriteComposers.includes(selectedComposer.id) ? "フォローを解除" : "お気に入りに登録"}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (user.id === "guest-user") {
+                      onRequireAuth?.();
+                    } else {
+                      onToggleFavorite(selectedComposer.id);
+                    }
+                  }}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition duration-200 ${
+                    user.favoriteComposers.includes(selectedComposer.id)
+                      ? "bg-rose-950/40 hover:bg-rose-950/60 border border-rose-500/40 text-rose-300"
+                      : "bg-stone-850 hover:bg-stone-800 text-yellow-100 border border-stone-700"
+                  }`}
+                >
+                  <Heart className="w-3.5 h-3.5" fill={user.favoriteComposers.includes(selectedComposer.id) ? "currentColor" : "none"} />
+                  {user.favoriteComposers.includes(selectedComposer.id) ? "解除" : "フォロー"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (user.id === "guest-user") {
+                      onRequireAuth?.();
+                    } else {
+                      startEditing(selectedComposer);
+                    }
+                  }}
+                  className="px-4 py-2.5 bg-stone-850 hover:bg-stone-800 border border-stone-700 text-yellow-100/90 hover:text-yellow-50 font-semibold text-xs rounded-xl transition duration-200 flex items-center gap-1.5 shadow-md"
+                >
+                  <Edit2 className="w-3.5 h-3.5 text-yellow-200" />
+                  編集
+                </button>
+              </div>
             </div>
           ) : (
             <div className="bg-stone-900/40 border border-stone-850 border-dashed rounded-2xl p-8 text-center text-stone-500 h-64 flex flex-col justify-center items-center">

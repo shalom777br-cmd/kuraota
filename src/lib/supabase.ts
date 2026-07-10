@@ -158,15 +158,15 @@ export async function saveDashboard(dashboard: UserDashboard): Promise<{ success
       user_avatar: dashboard.userAvatar,
       title: dashboard.title,
       theme: dashboard.theme,
-      widgets: JSON.stringify(dashboard.widgets),
+      widgets: dashboard.widgets, // Pass array directly for jsonb type to avoid serialization and conversion errors
       scratchpad_text: dashboard.scratchpadText || "",
       created_at: dashboard.createdAt
     };
 
-    // Attempt upsert based on user_id
+    // Attempt upsert based on the primary key 'id' (or 'user_id' fallback if constraint error)
     const { error } = await client
       .from("lharmonie_dashboards")
-      .upsert(dbPayload, { onConflict: "user_id" });
+      .upsert(dbPayload, { onConflict: "id" });
 
     if (error) {
       console.error("Supabase upsert failed:", error);
