@@ -427,6 +427,7 @@ export default function App() {
               concerts={concerts}
               posts={posts}
               onRequireAuth={() => setIsAuthOpen(true)}
+              onUpdateUser={(updatedUser) => setUser(updatedUser)}
             />
           )}
         </div>
