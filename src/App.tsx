@@ -57,6 +57,44 @@ export default function App() {
   // Save state to local storage when changed
   useEffect(() => {
     localStorage.setItem("lharmonie_user", JSON.stringify(user));
+
+    // Also sync back to registered accounts if they are logged in so their changes (like favorited composers) are fully persistent across sessions and logins
+    if (user && user.id !== "guest-user") {
+      const accountsKey = "lharmonie_registered_accounts";
+      try {
+        const existingAccounts = JSON.parse(localStorage.getItem(accountsKey) || "[]");
+        let modified = false;
+        const updatedAccounts = existingAccounts.map((acc: any) => {
+          if (acc.id === user.id) {
+            modified = true;
+            return {
+              ...acc,
+              name: user.name,
+              avatar: user.avatar,
+              role: user.role,
+              favoriteComposers: user.favoriteComposers
+            };
+          }
+          return acc;
+        });
+
+        if (!modified && user.id === "user-me") {
+          updatedAccounts.push({
+            id: "user-me",
+            email: "me@lharmonie.com",
+            passwordHash: "default",
+            name: user.name,
+            role: user.role,
+            avatar: user.avatar,
+            favoriteComposers: user.favoriteComposers
+          });
+        }
+
+        localStorage.setItem(accountsKey, JSON.stringify(updatedAccounts));
+      } catch (e) {
+        console.error("Error saving registered user changes", e);
+      }
+    }
   }, [user]);
 
   useEffect(() => {

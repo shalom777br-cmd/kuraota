@@ -9,11 +9,13 @@ interface AuthModalProps {
 }
 
 interface LocalAccount {
+  id?: string;
   email: string;
   passwordHash: string; // Plain-text logic in local storage for simulation
   name: string;
   role: string;
   avatar: string;
+  favoriteComposers?: string[];
 }
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
@@ -32,6 +34,12 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
   const [customGoogleEmail, setCustomGoogleEmail] = useState("");
 
   if (!isOpen) return null;
+
+  // Helper to generate a stable, persistent ID from email to prevent dynamic IDs on every login
+  const getStableId = (userEmail: string, prefix = "user") => {
+    const cleaned = userEmail.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+    return `${prefix}-${cleaned}`;
+  };
 
   // Preset google accounts to choose from or type custom
   const googlePresets = [
@@ -88,12 +96,15 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
       ];
       const selectedAvatar = randomAvatars[Math.floor(Math.random() * randomAvatars.length)];
 
+      const stableId = getStableId(email);
       const newAccount: LocalAccount = {
+        id: stableId,
         email,
         passwordHash: password, // For client-side demo
         name,
         role: role || "クラシック愛好家",
-        avatar: selectedAvatar
+        avatar: selectedAvatar,
+        favoriteComposers: []
       };
 
       existingAccounts.push(newAccount);
@@ -102,7 +113,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
       setSuccess("アカウント登録に成功しました！ログインしています...");
       setTimeout(() => {
         onLoginSuccess({
-          id: `user-${Date.now()}`,
+          id: newAccount.id || stableId,
           name: newAccount.name,
           avatar: newAccount.avatar,
           role: newAccount.role,
@@ -113,39 +124,64 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
 
     } else {
       // Log In process
-      const account = existingAccounts.find(
+      const accountIndex = existingAccounts.findIndex(
         (acc) => acc.email.toLowerCase() === email.toLowerCase() && acc.passwordHash === password
       );
 
       // Check default fallback simulation account
-      if (!account && email === "admin@gmail.com" && password === "password123") {
+      if (accountIndex === -1 && email === "admin@gmail.com" && password === "password123") {
         setSuccess("デモ管理者としてログインしました。");
-        setTimeout(() => {
-          onLoginSuccess({
-            id: "user-admin",
+        
+        const adminId = "user-admin";
+        let adminAccount = existingAccounts.find((acc) => acc.id === adminId);
+        if (!adminAccount) {
+          adminAccount = {
+            id: adminId,
+            email: "admin@gmail.com",
+            passwordHash: "password123",
             name: "L'harmonie管理者",
             avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=120",
             role: "アンサンブル指導者 / 全般クラシック研究家",
             favoriteComposers: ["beethoven", "bach"]
+          };
+          existingAccounts.push(adminAccount);
+          localStorage.setItem(accountsKey, JSON.stringify(existingAccounts));
+        }
+
+        setTimeout(() => {
+          onLoginSuccess({
+            id: adminAccount!.id || adminId,
+            name: adminAccount!.name,
+            avatar: adminAccount!.avatar,
+            role: adminAccount!.role,
+            favoriteComposers: adminAccount!.favoriteComposers || ["beethoven", "bach"]
           });
           onClose();
         }, 1000);
         return;
       }
 
-      if (!account) {
+      if (accountIndex === -1) {
         setError("メールアドレスまたはパスワードが正しくありません。登録していない場合は「新規アカウント作成」をお選びください。");
         return;
+      }
+
+      const account = existingAccounts[accountIndex];
+      // Generate ID if missing
+      if (!account.id) {
+        account.id = getStableId(account.email);
+        existingAccounts[accountIndex] = account;
+        localStorage.setItem(accountsKey, JSON.stringify(existingAccounts));
       }
 
       setSuccess("ログインに成功しました！");
       setTimeout(() => {
         onLoginSuccess({
-          id: `user-${Date.now()}`,
+          id: account.id!,
           name: account.name,
           avatar: account.avatar,
           role: account.role,
-          favoriteComposers: []
+          favoriteComposers: account.favoriteComposers || []
         });
         onClose();
       }, 1000);
@@ -154,13 +190,40 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
 
   const handleGoogleSelect = (name: string, email: string, avatar: string, role: string) => {
     setSuccess(`Googleアカウント「${name}」で接続しました！`);
+    
+    const accountsKey = "lharmonie_registered_accounts";
+    const existingAccounts: LocalAccount[] = JSON.parse(localStorage.getItem(accountsKey) || "[]");
+    
+    const stableId = getStableId(email, "google");
+    let account = existingAccounts.find((acc) => acc.id === stableId || acc.email.toLowerCase() === email.toLowerCase());
+    
+    if (!account) {
+      account = {
+        id: stableId,
+        email,
+        passwordHash: "google-oauth-sim",
+        name,
+        role,
+        avatar,
+        favoriteComposers: []
+      };
+      existingAccounts.push(account);
+      localStorage.setItem(accountsKey, JSON.stringify(existingAccounts));
+    } else {
+      // Ensure it has ID
+      if (!account.id) {
+        account.id = stableId;
+        localStorage.setItem(accountsKey, JSON.stringify(existingAccounts));
+      }
+    }
+
     setTimeout(() => {
       onLoginSuccess({
-        id: `google-${Date.now()}`,
-        name,
-        avatar,
-        role,
-        favoriteComposers: []
+        id: account!.id || stableId,
+        name: account!.name,
+        avatar: account!.avatar,
+        role: account!.role,
+        favoriteComposers: account!.favoriteComposers || []
       });
       setShowGoogleSim(false);
       onClose();
