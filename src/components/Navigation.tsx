@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Music, Search, MessageSquare, Users } from 'lucide-react';
+import { UserMenu } from './UserMenu';
 
 type Page = 'recommendations' | 'review' | 'composer';
 
@@ -12,9 +13,20 @@ interface NavItem {
 interface NavigationProps {
   currentPage: Page;
   onPageChange: (page: Page) => void;
+  isAuthenticated: boolean;
+  email?: string;
+  onSignOut?: () => Promise<void>;
+  isLoading?: boolean;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange }) => {
+export const Navigation: React.FC<NavigationProps> = ({
+  currentPage,
+  onPageChange,
+  isAuthenticated,
+  email,
+  onSignOut,
+  isLoading,
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems: NavItem[] = [
@@ -24,7 +36,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChang
   ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -50,6 +62,11 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChang
               </button>
             ))}
           </div>
+
+          {/* User Menu / Auth Status */}
+          {isAuthenticated && email && onSignOut ? (
+            <UserMenu email={email} onSignOut={onSignOut} isLoading={isLoading || false} />
+          ) : null}
 
           {/* Mobile Menu Button */}
           <button

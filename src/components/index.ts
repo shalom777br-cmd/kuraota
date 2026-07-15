@@ -10,3 +10,7 @@ export { ReviewPreview } from './ReviewPreview';
 export { ComposerSearchForm } from './ComposerSearchForm';
 export { ComposerProfile } from './ComposerProfile';
 export { Navigation } from './Navigation';
+export { SignUpForm } from './SignUpForm';
+export { SignInForm } from './SignInForm';
+export { AuthModal } from './AuthModal';
+export { UserMenu } from './UserMenu';
