@@ -14,3 +14,4 @@ export { SignUpForm } from './SignUpForm';
 export { SignInForm } from './SignInForm';
 export { AuthModal } from './AuthModal';
 export { UserMenu } from './UserMenu';
+export { SaveRecommendationModal } from './SaveRecommendationModal';

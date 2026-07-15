@@ -4,9 +4,10 @@ import { AuthModal } from './components/AuthModal';
 import { RecommendationsPage } from './pages/RecommendationsPage';
 import { ReviewPage } from './pages/ReviewPage';
 import { ComposerPage } from './pages/ComposerPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { useAuth } from './hooks/useAuth';
 
-type Page = 'recommendations' | 'review' | 'composer';
+type Page = 'recommendations' | 'review' | 'composer' | 'profile';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('recommendations');
@@ -40,6 +41,8 @@ function App() {
         return <ReviewPage />;
       case 'composer':
         return <ComposerPage />;
+      case 'profile':
+        return <ProfilePage />;
       default:
         return <RecommendationsPage />;
     }

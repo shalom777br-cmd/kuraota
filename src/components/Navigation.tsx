@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Music, Search, MessageSquare, Users } from 'lucide-react';
-import { UserMenu } from './UserMenu';
+import { UserProfileMenu } from './UserProfileMenu';
 
-type Page = 'recommendations' | 'review' | 'composer';
+type Page = 'recommendations' | 'review' | 'composer' | 'profile';
 
 interface NavItem {
   id: Page;
@@ -65,7 +65,12 @@ export const Navigation: React.FC<NavigationProps> = ({
 
           {/* User Menu / Auth Status */}
           {isAuthenticated && email && onSignOut ? (
-            <UserMenu email={email} onSignOut={onSignOut} isLoading={isLoading || false} />
+            <UserProfileMenu
+              email={email}
+              onProfileClick={() => onPageChange('profile')}
+              onSignOut={onSignOut}
+              isLoading={isLoading || false}
+            />
           ) : null}
 
           {/* Mobile Menu Button */}
@@ -101,6 +106,20 @@ export const Navigation: React.FC<NavigationProps> = ({
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={() => {
+                onPageChange('profile');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`flex items-center gap-2 w-full px-4 py-2 rounded-lg font-medium transition-colors ${
+                currentPage === 'profile'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Users className="w-5 h-5" />
+              マイプロフィール
+            </button>
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Music, LogOut, User } from 'lucide-react';
+import { UserProfileMenu } from './UserProfileMenu';
 
 interface UserMenuProps {
   email: string;
