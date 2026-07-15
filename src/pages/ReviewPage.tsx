@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Save, Download, AlertCircle } from 'lucide-react';
 import { ReviewForm, ReviewPreview } from '../components';
 import { useReviewHelper } from '../hooks/useReviewHelper';
@@ -82,7 +82,7 @@ ${generatedReview.review_text}
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">コンサートレビュー投稿</h1>
-        <p className="text-gray-600 mb-8">あなたの感想をAIが素敵なレビューに変換します</p>
+        <p className="text-gray-600 mb-8">あなたの感想をAIが素晴らしいレビューに変換します</p>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Form Section */}
