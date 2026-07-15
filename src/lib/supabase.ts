@@ -135,7 +135,7 @@ export async function fetchDashboards(): Promise<{ data: UserDashboard[]; isReal
 /**
  * Register or update a user's dashboard in Supabase (or localStorage fallback).
  */
-export async function saveDashboard(dashboard: UserDashboard): Promise<{ success: boolean; isRealSupabase: boolean; error?: string }> {
+export async function saveDashboard(dashboard: UserDashboard): Promise<{ success: boolean; isRealSupabase: boolean; error?: string; warning?: string }> {
   const client = getSupabaseClient();
   const localKey = "lharmonie_fallback_dashboards";
 
@@ -169,18 +169,22 @@ export async function saveDashboard(dashboard: UserDashboard): Promise<{ success
       .upsert(dbPayload, { onConflict: "id" });
 
     if (error) {
-      console.error("Supabase upsert failed:", error);
+      console.warn("Supabase upsert failed, falling back to localStorage:", error);
       return { 
-        success: false, 
-        isRealSupabase: true, 
-        error: `${error.message}. Ensure the 'lharmonie_dashboards' table exists. See setup instructions in dashboard.` 
+        success: true, 
+        isRealSupabase: false, 
+        warning: `Supabaseへの登録に失敗しました（${error.message}）。テーブル 'lharmonie_dashboards' が作成されているかご確認ください。データはローカルストレージに安全に保存されました。` 
       };
     }
 
     return { success: true, isRealSupabase: true };
   } catch (err: any) {
-    console.error("Supabase query error:", err);
-    return { success: false, isRealSupabase: true, error: err.message };
+    console.warn("Supabase query error, falling back to localStorage:", err);
+    return { 
+      success: true, 
+      isRealSupabase: false, 
+      warning: `接続エラー（${err.message || err}）。データはローカルストレージに安全に保存されました。` 
+    };
   }
 }
 

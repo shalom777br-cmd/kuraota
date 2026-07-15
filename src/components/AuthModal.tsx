@@ -282,11 +282,16 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
           {/* Social / Google Auth Trigger */}
           <div className="space-y-3 mb-6">
             <button
-              onClick={() => setShowGoogleSim(true)}
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-stone-950 hover:bg-stone-900 border border-stone-800 text-stone-200 text-2xs font-semibold rounded-xl transition duration-200 shadow-md shadow-black/10"
+              onClick={() => handleGoogleSelect(
+                "Shalom",
+                "shalom777br@gmail.com",
+                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120",
+                "クラシック特別会員 (Google連携済)"
+              )}
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 bg-stone-950 hover:bg-stone-900 border border-stone-800 text-stone-200 text-2xs font-semibold rounded-xl transition duration-200 shadow-md shadow-black/10 hover:border-yellow-200/40"
             >
               <Chrome className="w-4 h-4 text-red-400" />
-              Google アカウントで続行
+              Google アカウントで自動ログイン (ワンタップ)
             </button>
             
             <div className="flex items-center gap-2 text-3xs text-stone-500 py-1">

@@ -8,13 +8,28 @@ import CommunityTab from "./components/CommunityTab";
 import ConciergeTab from "./components/ConciergeTab";
 import DashboardTab from "./components/DashboardTab";
 import AuthModal from "./components/AuthModal";
-import { Music, Calendar, BookOpen, MessageSquare, Compass, Sparkles, Heart, Award, CheckCircle, LogIn, LogOut, Layout } from "lucide-react";
+import ProfileEditModal from "./components/ProfileEditModal";
+import { Music, Calendar, BookOpen, MessageSquare, Compass, Sparkles, Heart, Award, CheckCircle, LogIn, LogOut, Layout, Camera } from "lucide-react";
 
 export default function App() {
   // Load state from local storage or fallback to defaults
   const [user, setUser] = useState<User>(() => {
     const saved = localStorage.getItem("lharmonie_user");
-    return saved ? JSON.parse(saved) : INITIAL_USER;
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // ignore
+      }
+    }
+    // Auto login as shalom777br@gmail.com by default on first load
+    return {
+      id: "google-shalom777brgmailcom",
+      name: "Shalom",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120",
+      role: "クラシック特別会員 (Google連携済)",
+      favoriteComposers: ["beethoven", "chopin", "debussy"]
+    };
   });
 
   const [composers, setComposers] = useState<Composer[]>(() => {
@@ -52,7 +67,23 @@ export default function App() {
 
   const [concerts, setConcerts] = useState<UpcomingConcert[]>(() => {
     const saved = localStorage.getItem("lharmonie_concerts");
-    return saved ? JSON.parse(saved) : INITIAL_CONCERTS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasOld = parsed.some((c: any) => c.id === "concert-1" || c.id === "concert-2");
+        const hasSuntory = parsed.some((c: any) => c.id === "suntory-vienna-2026");
+        const hasSumida = parsed.some((c: any) => c.id === "sumida-triphony-2026");
+        if (hasOld || !hasSuntory || !hasSumida) {
+          const userCustom = parsed.filter((c: any) => c.id !== "concert-1" && c.id !== "concert-2" && !INITIAL_CONCERTS.some(ic => ic.id === c.id));
+          return [...INITIAL_CONCERTS, ...userCustom];
+        }
+        return parsed;
+      } catch (e) {
+        console.error("Error parsing lharmonie_concerts", e);
+        return INITIAL_CONCERTS;
+      }
+    }
+    return INITIAL_CONCERTS;
   });
 
   const [posts, setPosts] = useState<CommunityPost[]>(() => {
@@ -62,6 +93,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<"composers" | "reviews" | "concerts" | "community" | "concierge" | "dashboard">("composers");
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
   const handleLogout = () => {
     setUser({
@@ -287,11 +319,11 @@ export default function App() {
               </button>
             ) : (
               <div className="flex items-center gap-3 bg-stone-900/40 border border-stone-850 px-4 py-2 rounded-2xl max-w-xs">
-                {/* Clickable Avatar to Dashboard */}
+                {/* Clickable Avatar to Edit Profile */}
                 <button
-                  onClick={() => setActiveTab("dashboard")}
+                  onClick={() => setIsProfileEditOpen(true)}
                   className="relative group focus:outline-none flex-shrink-0"
-                  title="マイ・サロン (Supabaseダッシュボード) を開く"
+                  title="プロフィール画像を変更する"
                 >
                   <img
                     src={user.avatar}
@@ -300,7 +332,7 @@ export default function App() {
                     className="w-8 h-8 rounded-full border border-yellow-200/20 object-cover group-hover:scale-105 group-hover:border-yellow-200/60 transition duration-200"
                   />
                   <div className="absolute -bottom-1 -right-1 bg-yellow-100 text-stone-950 rounded-full p-0.5 shadow-md shadow-black/40 group-hover:scale-110 transition duration-200">
-                    <Layout className="w-2.5 h-2.5" />
+                    <Camera className="w-2.5 h-2.5" />
                   </div>
                 </button>
 
@@ -319,8 +351,15 @@ export default function App() {
 
                 <div className="flex items-center gap-1.5 ml-1 border-l border-stone-800 pl-2">
                   <button
+                    onClick={() => setIsProfileEditOpen(true)}
+                    className="text-[10px] text-yellow-200/90 hover:text-yellow-100 transition"
+                    title="プロフィール（画像や名前）を編集する"
+                  >
+                    編集
+                  </button>
+                  <button
                     onClick={() => setIsAuthOpen(true)}
-                    className="text-[10px] text-stone-400 hover:text-stone-200 transition"
+                    className="text-[10px] text-stone-400 hover:text-stone-200 transition ml-0.5"
                     title="アカウントを切り替える"
                   >
                     切替
@@ -432,6 +471,7 @@ export default function App() {
               user={user}
               onToggleInterest={handleToggleInterestConcert}
               onAddConcert={handleAddConcert}
+              onSyncConcerts={(newConcerts) => setConcerts(newConcerts)}
               onRequireAuth={() => setIsAuthOpen(true)}
             />
           )}
@@ -478,6 +518,14 @@ export default function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Profile Edit Modal */}
+      <ProfileEditModal
+        isOpen={isProfileEditOpen}
+        onClose={() => setIsProfileEditOpen(false)}
+        user={user}
+        onUpdateUser={(updatedUser) => setUser(updatedUser)}
       />
     </div>
   );

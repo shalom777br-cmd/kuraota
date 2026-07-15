@@ -7,10 +7,13 @@ interface ConcertTabProps {
   user: User;
   onToggleInterest: (concertId: string) => void;
   onAddConcert: (concert: UpcomingConcert) => void;
+  onSyncConcerts: (concerts: UpcomingConcert[]) => void;
   onRequireAuth?: () => void;
 }
 
-export default function ConcertTab({ concerts, user, onToggleInterest, onAddConcert, onRequireAuth }: ConcertTabProps) {
+export default function ConcertTab({ concerts, user, onToggleInterest, onAddConcert, onSyncConcerts, onRequireAuth }: ConcertTabProps) {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [title, setTitle] = useState("");
   const [composer, setComposer] = useState("");
@@ -21,6 +24,50 @@ export default function ConcertTab({ concerts, user, onToggleInterest, onAddConc
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [ticketLink, setTicketLink] = useState("");
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    setSyncError(null);
+    try {
+      const response = await fetch("/api/live-concerts/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      if (!response.ok) {
+        throw new Error("自動同期に失敗しました。サーバーエラーが発生しました。");
+      }
+      const data = await response.json();
+      if (data.success && Array.isArray(data.concerts)) {
+        const updated = [...concerts];
+        data.concerts.forEach((newC: UpcomingConcert) => {
+          // Find matching concert by ID or combination of date and title
+          const index = updated.findIndex(c => c.id === newC.id || (c.date === newC.date && c.title === newC.title));
+          if (index > -1) {
+            // Update existing but preserve user interest flags
+            updated[index] = {
+              ...updated[index],
+              ...newC,
+              interestedUsers: updated[index].interestedUsers,
+              interestedCount: updated[index].interestedCount
+            };
+          } else {
+            // Prepend new live concert
+            updated.unshift(newC);
+          }
+        });
+        onSyncConcerts(updated);
+      } else {
+        throw new Error(data.error || "自動同期に失敗しました。");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setSyncError(err.message || "同期中にエラーが発生しました。インターネット接続やAPIの設定をご確認ください。");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,20 +121,53 @@ export default function ConcertTab({ concerts, user, onToggleInterest, onAddConc
           </p>
         </div>
         
-        <button
-          onClick={() => {
-            if (user.id === "guest-user") {
-              onRequireAuth?.();
-            } else {
-              setShowAddForm(true);
-            }
-          }}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 border border-yellow-200/20 hover:bg-stone-850 text-yellow-100/90 font-medium text-xs rounded-xl transition duration-200 shadow-lg shadow-black/20"
-        >
-          <Plus className="w-4 h-4" />
-          演奏会情報をシェアする
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* AI自動更新ボタン */}
+          <button
+            onClick={handleSync}
+            disabled={isSyncing}
+            className={`flex items-center justify-center gap-2 px-4 py-2 bg-yellow-200/5 hover:bg-yellow-200/10 border ${isSyncing ? "border-amber-500/20 text-stone-500 cursor-not-allowed" : "border-yellow-200/30 text-yellow-100/95"} font-medium text-xs rounded-xl transition duration-200 shadow-lg`}
+          >
+            {isSyncing ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>AIで公演情報を同期中...</span>
+              </>
+            ) : (
+              <>
+                <Globe className="w-4 h-4 text-yellow-200" />
+                <span>AIで最新の公演情報を自動更新</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={() => {
+              if (user.id === "guest-user") {
+                onRequireAuth?.();
+              } else {
+                setShowAddForm(true);
+              }
+            }}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 border border-yellow-200/20 hover:bg-stone-850 text-yellow-100/90 font-medium text-xs rounded-xl transition duration-200 shadow-lg shadow-black/20"
+          >
+            <Plus className="w-4 h-4" />
+            演奏会情報をシェアする
+          </button>
+        </div>
       </div>
+
+      {syncError && (
+        <div className="p-4 bg-red-950/30 border border-red-900/50 rounded-2xl text-xs text-red-400 flex items-center justify-between gap-2">
+          <span>{syncError}</span>
+          <button onClick={() => setSyncError(null)} className="text-red-400 hover:text-red-350 p-1">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Add Concert Modal Form */}
       {showAddForm && (
@@ -276,12 +356,7 @@ export default function ConcertTab({ concerts, user, onToggleInterest, onAddConc
                 </div>
 
                 {/* Right interactions */}
-                <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 w-full lg:w-auto border-t lg:border-t-0 border-stone-800 pt-4 lg:pt-0">
-                  <div className="flex items-center gap-1.5 text-3xs text-stone-400">
-                    <Users className="w-4 h-4 text-yellow-200/80" />
-                    <span>他 <strong>{c.interestedCount}</strong> 人が関心を持っています</span>
-                  </div>
-
+                <div className="flex flex-col items-stretch lg:items-end justify-center gap-3 w-full lg:w-auto border-t lg:border-t-0 border-stone-800/50 pt-4 lg:pt-0">
                   <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
                     {c.ticketLink && (
                       <a
