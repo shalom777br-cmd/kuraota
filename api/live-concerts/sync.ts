@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getGeminiClient } from '../_lib/gemini';
-import { REAL_CONCERTS_FALLBACK } from '../_lib/fallback-concerts';
+import { getGeminiClient } from '../_lib/gemini.js';
+import { REAL_CONCERTS_FALLBACK } from '../_lib/fallback-concerts.js';
 import { Type } from '@google/genai';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
