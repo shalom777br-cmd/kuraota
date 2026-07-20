@@ -163,27 +163,69 @@ export async function saveDashboard(dashboard: UserDashboard): Promise<{ success
       created_at: dashboard.createdAt
     };
 
-    // Attempt upsert based on the primary key 'id' (or 'user_id' fallback if constraint error)
-    const { error } = await client
+    // First, check if a dashboard with this user_id already exists to avoid complex onConflict/index errors
+    const { data: existing, error: checkError } = await client
       .from("lharmonie_dashboards")
-      .upsert(dbPayload, { onConflict: "id" });
+      .select("id")
+      .eq("user_id", dashboard.userId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.warn("Supabase connection or table check failed:", checkError);
+      return {
+        success: false,
+        isRealSupabase: true,
+        error: `データベースの接続テストに失敗しました（${checkError.message}）。テーブルが作成されているか、設定値を確認してください。`
+      };
+    }
+
+    let error = null;
+
+    if (existing) {
+      // Perform explicit UPDATE based on user_id (safest way to maintain single record per user)
+      const { error: updateError } = await client
+        .from("lharmonie_dashboards")
+        .update({
+          user_name: dashboard.userName,
+          user_avatar: dashboard.userAvatar,
+          title: dashboard.title,
+          theme: dashboard.theme,
+          widgets: dashboard.widgets,
+          scratchpad_text: dbPayload.scratchpad_text,
+          created_at: dbPayload.created_at
+        })
+        .eq("user_id", dashboard.userId);
+      error = updateError;
+    } else {
+      // Perform explicit INSERT
+      const { error: insertError } = await client
+        .from("lharmonie_dashboards")
+        .insert(dbPayload);
+      error = insertError;
+    }
 
     if (error) {
-      console.warn("Supabase upsert failed, falling back to localStorage:", error);
+      console.warn("Supabase DB operation failed:", error);
+      let errorDetail = `Supabaseへの登録に失敗しました（${error.message}）。`;
+      if (error.message?.includes("relation") || error.message?.includes("not found")) {
+        errorDetail += "テーブル 'lharmonie_dashboards' が作成されていない可能性があります。「接続設定」パネルを開き、SQL Editor用のスクリプトを実行してください。";
+      } else if (error.message?.includes("policy") || error.message?.includes("permission")) {
+        errorDetail += "RLSポリシーにより書き込みが制限されている可能性があります。SQL内のポリシー設定も一緒に実行したかご確認ください。";
+      }
       return { 
-        success: true, 
-        isRealSupabase: false, 
-        warning: `Supabaseへの登録に失敗しました（${error.message}）。テーブル 'lharmonie_dashboards' が作成されているかご確認ください。データはローカルストレージに安全に保存されました。` 
+        success: false, 
+        isRealSupabase: true, 
+        error: errorDetail
       };
     }
 
     return { success: true, isRealSupabase: true };
   } catch (err: any) {
-    console.warn("Supabase query error, falling back to localStorage:", err);
+    console.warn("Supabase query error:", err);
     return { 
-      success: true, 
-      isRealSupabase: false, 
-      warning: `接続エラー（${err.message || err}）。データはローカルストレージに安全に保存されました。` 
+      success: false, 
+      isRealSupabase: true, 
+      error: `接続エラー（${err.message || err}）。環境変数やネットワーク、認証キーを確認してください。データはローカルに保存されました。` 
     };
   }
 }
@@ -220,5 +262,47 @@ export async function deleteDashboard(id: string, userId: string): Promise<{ suc
   } catch (err) {
     console.error("Supabase delete crashed:", err);
     return { success: false, isRealSupabase: true };
+  }
+}
+
+/**
+ * Test Supabase connection and check if table 'lharmonie_dashboards' exists and is accessible.
+ */
+export async function testSupabaseConnection(): Promise<{ success: boolean; message: string }> {
+  const client = getSupabaseClient();
+  if (!client) {
+    return { success: false, message: "SupabaseのURLまたはAnon Keyが構成されていません。" };
+  }
+
+  try {
+    const { error } = await client
+      .from("lharmonie_dashboards")
+      .select("id")
+      .limit(1);
+
+    if (error) {
+      console.warn("Supabase connection test failed:", error);
+      if (error.message?.includes("relation") || error.message?.includes("not found")) {
+        return {
+          success: false,
+          message: `接続はできましたが、テーブル 'lharmonie_dashboards' が存在しません。SQL Editorでテーブル定義を実行してください。`
+        };
+      }
+      return {
+        success: false,
+        message: `認証またはポリシー制限エラーが発生しました（${error.message}）。Anon KeyやRLSポリシーを確認してください。`
+      };
+    }
+
+    return {
+      success: true,
+      message: "接続成功！ テーブル 'lharmonie_dashboards' は正常に利用可能です。"
+    };
+  } catch (err: any) {
+    console.error("Connection test crashed:", err);
+    return {
+      success: false,
+      message: `接続テスト中に予期せぬエラーが発生しました: ${err.message || err}`
+    };
   }
 }

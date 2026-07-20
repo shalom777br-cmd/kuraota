@@ -10,6 +10,7 @@ import DashboardTab from "./components/DashboardTab";
 import AuthModal from "./components/AuthModal";
 import ProfileEditModal from "./components/ProfileEditModal";
 import { Music, Calendar, BookOpen, MessageSquare, Compass, Sparkles, Heart, Award, CheckCircle, LogIn, LogOut, Layout, Camera } from "lucide-react";
+import { fetchDashboards, saveDashboard } from "./lib/supabase";
 
 export default function App() {
   // Load state from local storage or fallback to defaults
@@ -151,6 +152,47 @@ export default function App() {
       }
     }
   }, [user]);
+
+  // Sync profile changes (name and avatar) with existing registered Supabase dashboard automatically
+  useEffect(() => {
+    if (user && user.id !== "guest-user") {
+      const lastSyncedUser = localStorage.getItem("lharmonie_last_synced_profile");
+      let shouldSync = false;
+      if (lastSyncedUser) {
+        try {
+          const parsed = JSON.parse(lastSyncedUser);
+          if (parsed.name !== user.name || parsed.avatar !== user.avatar) {
+            shouldSync = true;
+          }
+        } catch (e) {
+          shouldSync = true;
+        }
+      } else {
+        shouldSync = true;
+      }
+
+      if (shouldSync) {
+        const syncDashboardProfile = async () => {
+          try {
+            const { data } = await fetchDashboards();
+            const myDashboard = data.find((d) => d.userId === user.id);
+            if (myDashboard && (myDashboard.userName !== user.name || myDashboard.userAvatar !== user.avatar)) {
+              const updated = {
+                ...myDashboard,
+                userName: user.name,
+                userAvatar: user.avatar
+              };
+              await saveDashboard(updated);
+            }
+            localStorage.setItem("lharmonie_last_synced_profile", JSON.stringify({ name: user.name, avatar: user.avatar }));
+          } catch (err) {
+            console.warn("Auto-sync profile to dashboard failed:", err);
+          }
+        };
+        syncDashboardProfile();
+      }
+    }
+  }, [user.name, user.avatar]);
 
   useEffect(() => {
     localStorage.setItem("lharmonie_composers", JSON.stringify(composers));

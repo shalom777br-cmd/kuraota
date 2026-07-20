@@ -97,66 +97,13 @@ export const INITIAL_COMPOSERS: Composer[] = [
     country: "ドイツ",
     lifespan: "1833 - 1897",
     biography: "バッハ、ベートーヴェンと共に「ドイツ3大B」と称され、ロマン派の時代にありながら、古典派の厳格な形式美と深い叙情性を融合させた独自の音楽世界を築きました。交響曲や室内楽、歌曲において不朽の傑作を数多く残しています。",
-    funFact: "若き日には生活を支えるため港町の居酒屋やキャバレーでピアノを演奏しており、そこで様々な大衆音楽（ハンガリー民謡など）に親しんだことが後の『ハンガリー舞曲』の創作に繋がったとされています。",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300",
+    funFact: "若き日には生活を支えるため、港町の居酒屋やバーでピアノ演奏のアルバイトをして家計を助けていたと言われています。",
+    image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=300",
     famousPieces: [
       "交響曲 第1番 ハ短調 Op.68",
-      "ハンガリー舞曲 第5番 嬰ヘ短調",
-      "クラリネット五重奏曲 ロ短調 Op.115"
+      "クラリネット五重奏曲 ロ短調 Op.115",
+      "ハンガリー舞曲集"
     ]
-  },
-  {
-    id: "dvorak",
-    nameJa: "アントニン・ドヴォルザーク",
-    nameEn: "Antonín Dvořák",
-    era: "ロマン派",
-    country: "チェコ",
-    lifespan: "1841 - 1904",
-    biography: "チェコの民族音楽の調べを芸術的に昇華させ、ブラームスに見出されて世界的に活躍しました。後にアメリカへ渡り、黒人霊歌やインディアンの旋律にインスピレーションを得て、名作交響曲第9番『新世界より』を作曲しました。",
-    funFact: "無類の鉄道マニア（熱狂的な汽車好き）であり、プラハの駅に毎日通っては蒸気機関車の番号をノートに記録し、新任の機関士に話しかけるのが日課だったと言われています。",
-    image: "https://images.unsplash.com/photo-1484755560695-a4c740285fa6?auto=format&fit=crop&q=80&w=300",
-    famousPieces: [
-      "交響曲 第9番 ホ短調 Op.95『新世界より』",
-      "チェロ協奏曲 ロ短調 Op.104",
-      "弦楽四重奏曲 第12番 ヘ長調 Op.96『アメリカ』"
-    ]
-  }
-];
-
-export const INITIAL_REVIEWS: ConcertReview[] = [
-  {
-    id: "review-1",
-    authorId: "user-1",
-    authorName: "マエストロ・ケン",
-    authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120",
-    composer: "ルートヴィヒ・ヴァン・ベートーヴェン",
-    piece: "交響曲 第9番『合唱付き』",
-    performanceDate: "2026-06-25",
-    venue: "サントリーホール (東京)",
-    performer: "東京交響楽団 / 指揮: 広上淳一",
-    rating: 5,
-    title: "歓喜の歌がホールに満ちる、圧倒的な精神力！",
-    reviewText: "やはり年末でなくてもサントリーホールで聴く第九は格別です。第3楽章の深い静寂から、第4楽章の爆発的な歓喜へと至る指揮の構築力に脱帽。独唱陣、合唱団のブレスコントロールと発音も極めて明瞭で、ホール全体が温かく、そして力強い人間の魂の賛歌に包まれました。フィナーレでのテンポアップは息を呑む緊張感でした！",
-    createdAt: "2026-06-26T12:00:00Z",
-    likes: 24,
-    commentsCount: 3
-  },
-  {
-    id: "review-2",
-    authorId: "user-2",
-    authorName: "ピアノソナタの森",
-    authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120",
-    composer: "フレデリック・ショパン",
-    piece: "24の前奏曲 Op.28 (全曲)",
-    performanceDate: "2026-07-02",
-    venue: "東京オペラシティ コンサートホール",
-    performer: "ピアノ: ラファウ・ブレハッチ",
-    rating: 4,
-    title: "静寂を彩る、極彩色のショパン",
-    reviewText: "ブレハッチによる前奏曲集。第15番『雨だれ』の絶え間ない連打音が運命の足音のように響き渡り、中間部の重厚な盛り上がりが素晴らしい陰影を描き出しました。ピアニッシモの美しさが極めて秀逸で、一音一音が結晶のようにきらめいていました。ただ、第16番の超絶技巧的なパッセージにおいて若干荒さを感じる箇所もありましたが、それもライブならではの熱量として楽しめました。",
-    createdAt: "2026-07-03T09:30:00Z",
-    likes: 18,
-    commentsCount: 1
   }
 ];
 
@@ -170,11 +117,71 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     venue: "サントリーホール 大ホール",
     date: "2026-11-08",
     time: "19:00",
-    description: "世界最高峰のオーケストラ、ウィーン・フィルが贈る特別な秋の一夜。ブルックナー生誕200年周年を記念する交響曲第7番の重厚な響きと、モーツァルトが到達した究極 of ポリフォニー『ジュピター』。ティーレマンのタクトがサントリーホールの豊かな残響と一体となります。",
+    description: "世界最高峰のオーケストラ、ウィーン・フィルが贈る特別な秋の一夜。ブルックナー生誕200年周年を締めくくる交響曲第7番の深遠な調べと、モーツァルトが到達した究極のポリフォニー『ジュピター』。ティーレマンのタクトがサントリーホールの豊かな残響と一体となります。",
     submittedBy: "サントリーホール事務局",
     interestedUsers: ["user-1", "user-2"],
     interestedCount: 2,
     ticketLink: "https://www.suntory.co.jp/suntoryhall/"
+  },
+  {
+    id: "nhkhall-nhkso-2026",
+    title: "NHK交響楽団 定期演奏会（第2015回 定期公演 Aプログラム）",
+    composer: "グスタフ・マーラー",
+    program: "マーラー：交響曲 第2番 ハ短調『復活』",
+    performer: "NHK交響楽団 / 指揮: ファビオ・ルイージ / ソプラノ: マリー・ソフィー・ポラック / メゾ・ソプラノ: 藤村実穂子 / 新国立劇場合唱団",
+    venue: "NHKホール",
+    date: "2026-09-12",
+    time: "18:00",
+    description: "NHK交響楽団の新シーズンはマエストロ、ファビオ・ルイージのタクトで開幕！オルガンと大合唱がNHKホールの巨大な空間を埋め尽くす、宇宙的かつ感動的なマーラーの『復活』を体験してください。死から再生へと向かう渾身のフィナーレは圧巻です。",
+    submittedBy: "N響プロムナード",
+    interestedUsers: ["user-me", "user-2"],
+    interestedCount: 2,
+    ticketLink: "https://www.nhkso.or.jp/"
+  },
+  {
+    id: "suntory-yomikyo-2026",
+    title: "読売日本交響楽団 第662回 定期演奏会",
+    composer: "ヨハネス・ブラームス",
+    program: "ブラームス：ピアノ協奏曲 第2番 変ロ長調 Op.83、ブラームス：交響曲 第2番 ニ長調 Op.73",
+    performer: "読売日本交響楽団 / 指揮: セバスティアン・ヴァイグレ / ピアノ: ゲルハルト・オピッツ",
+    venue: "サントリーホール 大ホール",
+    date: "2026-09-08",
+    time: "19:00",
+    description: "読響常任指揮者セバスティアン・ヴァイグレが描く、重厚にして叙情豊かなオール・ブラームス・プログラム。世界的名手ゲルハルト・オピッツを迎えたピアノ協奏曲第2番は、ピアノを含んだ交響曲とも評される珠玉の傑作です。秋の始まりを飾る、極上のロマンティシズムをご堪能ください。",
+    submittedBy: "都響ファンクラブ",
+    interestedUsers: ["user-1"],
+    interestedCount: 1,
+    ticketLink: "https://yomikyo.or.jp/"
+  },
+  {
+    id: "suntory-tso-2026",
+    title: "東京交響楽団 第744回 定期演奏会",
+    composer: "リゲティ / ベルク / ベートーヴェン",
+    program: "リゲティ：サンフランシスコ・ポリフォニー、ベルク：ヴァイオリン協奏曲『ある天使の思い出に』、ベートーヴェン：交響曲 第3番 ヘ長調『英雄』",
+    performer: "東京交響楽団 / 指揮: ジョナサン・ノット / ヴァイオリン: イザベル・ファウスト",
+    venue: "サントリーホール 大ホール",
+    date: "2026-10-17",
+    time: "18:00",
+    description: "東響音楽監督ジョナサン・ノットが放つ、極めて刺激的かつ哲学的なプログラミング。現代屈指の名ヴァイオリニスト、イザベル・ファウストが奏でるベルクの協奏曲と、名匠ノットによるドラマティックなベートーヴェン『英雄』が、秋のサントリーホールを熱狂の渦に巻き込みます。",
+    submittedBy: "東響友の会",
+    interestedUsers: [],
+    interestedCount: 0,
+    ticketLink: "https://tokyosymphony.jp/"
+  },
+  {
+    id: "sumida-triphony-2026",
+    title: "新日本フィルハーモニー交響楽団 第672回 定期演奏会",
+    composer: "リヒャルト・ワーグナー",
+    program: "ワーグナー（ロリン・マゼール編曲）：楽劇『ニーベルングの指環』～言葉のない指環",
+    performer: "新日本フィルハーモニー交響楽団 / 指揮: 上岡敏之",
+    venue: "すみだトリフォニーホール 大ホール",
+    date: "2026-10-24",
+    time: "14:00",
+    description: "すみだトリフォニーホールの極上アコースティックで聴く、上岡敏之と新日本フィルのワーグナー！マゼールが15時間の楽劇4部作『ニーベルングの指環』の管弦楽美を1時間余りに凝縮した『言葉のない指環』は、息を呑むオーケストラ絵巻です。圧倒的なダイナミズムをお楽しみください。",
+    submittedBy: "新日本フィル応援団",
+    interestedUsers: ["user-me"],
+    interestedCount: 1,
+    ticketLink: "https://www.njp.or.jp/"
   },
   {
     id: "operacity-organ-2026",
@@ -185,26 +192,11 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     venue: "東京オペラシティ コンサートホール：タケミツ メモリアル",
     date: "2026-10-18",
     time: "14:00",
-    description: "東京オペラシティが誇る国内屈指のパイプオルガン「クーン社製」によるオール・バッハ・リサイタル。世界的音楽家・鈴木優人の圧倒的なテクニックと色彩豊かなレジストレーションによって、大ホールの天上から降り注ぐパイプオルガンの真髄をご堪能ください。",
+    description: "東京オペラシティが誇る国内屈指のパイプオルガン「スイス・クーン社製」によるオール・バッハ・リサイタル。世界的音楽家・鈴木優人の圧倒的なテクニックと色彩豊かなレジストレーションによって、大ホールの天上から降り注ぐ荘厳なバッハの宇宙をご体験いただけます。",
     submittedBy: "オペラシティ愛好会",
     interestedUsers: ["user-me"],
     interestedCount: 1,
     ticketLink: "https://www.operacity.jp/"
-  },
-  {
-    id: "geigeki-rachmaninoff-2026",
-    title: "東京芸術劇場VSオーケストラシリーズ：ラフマニノフとロシアの熱情",
-    composer: "セルゲイ・ラフマニノフ / ピョートル・チャイコフスキー",
-    program: "ラフマニノフ：ピアノ協奏曲 第2番 ハ短調 Op.18、チャイコフスキー：交響曲 第5番 ホ短調 Op.64",
-    performer: "東京都交響楽団 / 指揮: 大野和士 / ピアノ: 藤田真央",
-    venue: "東京芸術劇場 コンサートホール",
-    date: "2026-09-23",
-    time: "15:00",
-    description: "クラシック音楽専用として極上の音響設計が施された東京芸術劇場。今や世界中で絶大な人気を誇るピアニスト藤田真央をソリストに迎え、哀愁と情熱が渦巻くラフマニノフの傑作第2番を披露します。後半は大野＆都響が描くドラマチックなチャイコフスキー交響曲第5番。",
-    submittedBy: "都響ファンクラブ",
-    interestedUsers: ["user-1"],
-    interestedCount: 1,
-    ticketLink: "https://www.geigeki.jp/"
   },
   {
     id: "hamarikyu-quartet-2026",
@@ -215,26 +207,11 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     venue: "浜離宮朝日ホール",
     date: "2026-10-02",
     time: "19:00",
-    description: "「室内楽の殿堂」として国内外のアーティストから絶賛される極限の音響空間、浜離宮朝日ホール。ミュンヘン国際音楽コンクール第3位など数々の賞歴を持つ実力派『カルテット・アマービレ』が、緊迫感みなぎるベートーヴェンと、哀愁深く重厚なブラームスの名曲を紡ぎ出します。",
+    description: "「室内楽の殿堂」として世界的な響きを絶賛される浜離宮朝日ホール。ミュンヘン国際コンクール第3位の実力を誇る若きカルテット・アマービレが、ベートーヴェンの緊迫感漂う『セリオーソ』と、ロマン派の哀愁深いブラームス第1番を深く瑞々しく紡ぎ出します。",
     submittedBy: "室内楽ラバー",
     interestedUsers: ["user-2"],
     interestedCount: 1,
     ticketLink: "https://www.asahi-hall.jp/hamarikyu/"
-  },
-  {
-    id: "orchard-paris-2026",
-    title: "パリ管弦楽団来日公演（Bunkamuraオーチャードホール）",
-    composer: "モーリス・ラヴェル / モデスト・ムソルグスキー",
-    program: "ラヴェル：『マ・メール・ロワ』組曲、バレエ音楽『ダフニスとクロエ』第2組曲、ムソルグスキー（ラヴェル編曲）：組曲『展覧会の絵』",
-    performer: "パリ管弦楽団 / 指揮: クラウス・マケラ",
-    venue: "Bunkamura オーチャードホール",
-    date: "2026-12-12",
-    time: "18:00",
-    description: "名実ともに若き天才指揮者の最高峰であるクラウス・マケラと、色彩的なサウンドを得意とするパリ管弦楽団によるフランス・ロシア・プログラム。ラヴェルの華麗極まる管弦楽法と『展覧会の絵』のド迫力のフィナーレがオーチャードホールのダイナミックな空間に轟きます。",
-    submittedBy: "オーチャード友の会",
-    interestedUsers: [],
-    interestedCount: 0,
-    ticketLink: "https://www.bunkamura.co.jp/"
   },
   {
     id: "persimmon-chopin-2026",
@@ -245,44 +222,13 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     venue: "めぐろパーシモンホール 大ホール",
     date: "2026-08-29",
     time: "15:00",
-    description: "目黒区の緑豊かな一角にたたずむ、透き通ったアコースティックが自慢のめぐろパーシモンホール。ショパン国際ピアノコンクール第2位に輝き、日本中を熱狂に巻き込んだ反田恭平が登場。ノクターンから全曲演奏の前奏曲集、そして絢爛豪華な『英雄ポロネーズ』まで、ショパンの詩情と情熱の神髄を披露します。",
+    description: "ショパン国際ピアノコンクール第2位の快挙から、さらに深みを増した反田恭平が登場。透明な残響を誇るパーシモンホールで、ショパンの名曲、そして魂の『英雄ポロネーズ』と色彩豊かな『24の前奏曲』全曲をお届けします。",
     submittedBy: "パーシモン音楽愛好部",
     interestedUsers: ["user-me", "user-1"],
     interestedCount: 2,
     ticketLink: "https://www.persimmon.or.jp/"
-  },
-  {
-    id: "nhkhall-mahler-2026",
-    title: "NHK交響楽団 定期演奏会（第2015回 定期公演 Aプログラム）",
-    composer: "グスタフ・マーラー",
-    program: "マーラー：交響曲 第2番 ハ短調『復活』",
-    performer: "NHK交響楽団 / 指揮: ファビオ・ルイージ / ソプラノ: 三宅理恵 / メゾ・ソプラノ: 藤村実穂子 / 新国立劇場合唱団",
-    venue: "NHKホール",
-    date: "2026-09-18",
-    time: "19:00",
-    description: "NHKホールの大空間に響き渡るオルガンと大合唱！巨匠ファビオ・ルイージが導くN響が、壮大な宇宙的叙事詩『復活』を完璧な音響設計で再現。死から再生へと向かう息を呑むフィナーレ。独唱陣、合唱団のブレスコントロールと発音も極めて明瞭で、最高の精神を表現します。",
-    submittedBy: "N響プロムナード",
-    interestedUsers: ["user-me", "user-2"],
-    interestedCount: 2,
-    ticketLink: "https://www.nhkso.or.jp/"
-  },
-  {
-    id: "sumida-triphony-2026",
-    title: "新日本フィルハーモニー交響楽団 定期演奏会（すみだトリフォニーホール）",
-    composer: "リヒャルト・ワーグナー",
-    program: "ワーグナー（マゼール編曲）：楽劇『ニーベルングの指環』～言葉のない指環",
-    performer: "新日本フィルハーモニー交響楽団 / 指揮: 上岡敏之",
-    venue: "すみだトリフォニーホール 大ホール",
-    date: "2026-10-24",
-    time: "14:00 (13:15開場)",
-    description: "卓越したアコースティックを誇るすみだトリフォニーホール大ホールにて、名匠・上岡敏之と新日本フィルによる渾身のワーグナー。巨匠ロリン・マゼールが編曲した『言葉のない指環』は、壮大な楽劇4部作『ニーベルングの指環』の音楽的魅力をシームレスに凝縮した、息を呑むオーケストラの絵巻です。",
-    submittedBy: "新日本フィル応援団",
-    interestedUsers: ["user-me"],
-    interestedCount: 1,
-    ticketLink: "https://www.triphony.com/"
   }
 ];
-
 export const INITIAL_POSTS: CommunityPost[] = [
   {
     id: "post-1",
@@ -332,5 +278,42 @@ export const INITIAL_POSTS: CommunityPost[] = [
       }
     ],
     createdAt: "2026-07-08T01:45:00Z"
+  }
+];
+
+export const INITIAL_REVIEWS: ConcertReview[] = [
+  {
+    id: "review-1",
+    authorId: "user-2",
+    authorName: "ビオラ弾きのマサ",
+    authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120",
+    composer: "ヨハネス・ブラームス",
+    piece: "交響曲 第1番 ハ短調 Op.68",
+    performanceDate: "2026-06-12",
+    venue: "サントリーホール 大ホール",
+    performer: "ベルリン・フィルハーモニー管弦楽団 / 指揮: キリル・ペトレンコ",
+    rating: 5,
+    title: "息を呑む極限の緊張感と圧倒的な音響空間",
+    reviewText: "キリル・ペトレンコ率いるベルリン・フィルの来日公演。第1楽章冒頭のティンパニの打音から、全身の毛穴が開くような緊張感に包まれました。ペトレンコの引き締まったテンポ感と、オーケストラの一糸乱れぬアンサンブルはまさに圧巻。終楽章のホルンのコラール、そしてトロンボーンが入ってきた瞬間の神々しい美しさは一生忘れません。サントリーホールの音響も極限まで活かされていました。",
+    createdAt: "2026-06-13T10:00:00Z",
+    likes: 24,
+    commentsCount: 3
+  },
+  {
+    id: "review-2",
+    authorId: "user-3",
+    authorName: "エリーゼの末裔",
+    authorAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120",
+    composer: "フレデリック・ショパン",
+    piece: "24の前奏曲 Op.28",
+    performanceDate: "2026-05-18",
+    venue: "東京オペラシティ コンサートホール",
+    performer: "ピアノ: 藤田真央",
+    rating: 5,
+    title: "鍵盤から紡ぎ出される、一粒一粒が真珠のような極上の響き",
+    reviewText: "藤田真央さんのリサイタル。ショパンの前奏曲集は、一曲一曲がまったく異なる色彩を帯びて目の前に現れるようでした。『雨だれ』のあの静けさと底知れぬ深淵、そして第24番の嵐のような熱狂まで、彼の変幻自在な弱音のコントロールにはただただ魅了されました。音が天上から降ってくるような感覚を覚えた、奇跡的なリサイタルでした。",
+    createdAt: "2026-05-19T14:30:00Z",
+    likes: 18,
+    commentsCount: 2
   }
 ];
