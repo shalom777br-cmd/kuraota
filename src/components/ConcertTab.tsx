@@ -57,7 +57,18 @@ export default function ConcertTab({ concerts, user, onToggleInterest, onAddConc
             updated.unshift(newC);
           }
         });
-        onSyncConcerts(updated);
+
+        // Extra defensive step: deduplicate final array by ID to guarantee no duplicates
+        const seenIds = new Set<string>();
+        const deduped: UpcomingConcert[] = [];
+        updated.forEach((c) => {
+          if (!seenIds.has(c.id)) {
+            seenIds.add(c.id);
+            deduped.push(c);
+          }
+        });
+
+        onSyncConcerts(deduped);
       } else {
         throw new Error(data.error || "自動同期に失敗しました。");
       }

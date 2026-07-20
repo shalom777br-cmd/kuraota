@@ -71,14 +71,48 @@ export default function App() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const hasOld = parsed.some((c: any) => c.id === "concert-1" || c.id === "concert-2");
-        const hasSuntory = parsed.some((c: any) => c.id === "suntory-vienna-2026");
-        const hasSumida = parsed.some((c: any) => c.id === "sumida-triphony-2026");
+        // Clean up any duplicates and legacy IDs in saved state first to avoid duplicate keys
+        const uniqueParsed: UpcomingConcert[] = [];
+        const seenKeys = new Set<string>();
+        parsed.forEach((c: any) => {
+          if (!c || !c.id) return;
+          let id = c.id;
+          // Normalize old legacy IDs to the aligned IDs
+          if (id === "suntory-vienna-2026") id = "suntory-vienna-thielemann-20261108";
+          if (id === "nhkhall-nhkso-2026") id = "nhkhall-nhkso-luisi-20260912";
+          if (id === "suntory-yomikyo-2026") id = "suntory-yomikyo-weigle-20260908";
+          if (id === "suntory-tso-2026") id = "suntory-tso-nott-20261017";
+          if (id === "sumida-triphony-2026") id = "sumida-triphony-kamioka-20261024";
+          if (id === "operacity-organ-2026") id = "operacity-organ-suzuki-20261018";
+          if (id === "hamarikyu-quartet-2026") id = "hamarikyu-quartet-amabile-20261002";
+          if (id === "persimmon-chopin-2026") id = "persimmon-chopin-sorita-20260829";
+
+          const normalizedKey = `${id}_${c.date || ""}`;
+          if (!seenKeys.has(normalizedKey)) {
+            seenKeys.add(normalizedKey);
+            uniqueParsed.push({ ...c, id });
+          }
+        });
+
+        const hasOld = uniqueParsed.some((c: any) => c.id === "concert-1" || c.id === "concert-2");
+        const hasSuntory = uniqueParsed.some((c: any) => c.id === "suntory-vienna-thielemann-20261108");
+        const hasSumida = uniqueParsed.some((c: any) => c.id === "sumida-triphony-kamioka-20261024");
+        
         if (hasOld || !hasSuntory || !hasSumida) {
-          const userCustom = parsed.filter((c: any) => c.id !== "concert-1" && c.id !== "concert-2" && !INITIAL_CONCERTS.some(ic => ic.id === c.id));
+          const userCustom = uniqueParsed.filter((c: any) => {
+            if (c.id === "concert-1" || c.id === "concert-2") return false;
+            const isInitial = INITIAL_CONCERTS.some(ic => ic.id === c.id || (ic.date === c.date && ic.title === c.title));
+            const legacyIds = [
+              "suntory-vienna-2026", "nhkhall-nhkso-2026", "suntory-yomikyo-2026", 
+              "suntory-tso-2026", "sumida-triphony-2026", "operacity-organ-2026", 
+              "hamarikyu-quartet-2026", "persimmon-chopin-2026"
+            ];
+            const isLegacyInitial = legacyIds.includes(c.id);
+            return !isInitial && !isLegacyInitial;
+          });
           return [...INITIAL_CONCERTS, ...userCustom];
         }
-        return parsed;
+        return uniqueParsed;
       } catch (e) {
         console.error("Error parsing lharmonie_concerts", e);
         return INITIAL_CONCERTS;

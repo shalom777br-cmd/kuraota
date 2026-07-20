@@ -340,7 +340,13 @@ app.post("/api/live-concerts/sync", async (req, res) => {
         Return them in the specified JSON schema format.
       `;
 
-      const response = await ai.models.generateContent({
+      // 4-second timeout to prevent any Gateway Timeout (504) on Cloud Run due to slow Search Grounding
+      let timeoutId: NodeJS.Timeout;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("Gemini live search request timed out (4000ms limit reached)")), 4000);
+      });
+
+      const geminiPromise = ai.models.generateContent({
         model: "gemini-3.5-flash",
         contents: userPrompt,
         config: {
@@ -369,6 +375,9 @@ app.post("/api/live-concerts/sync", async (req, res) => {
         }
       });
 
+      const response = await Promise.race([geminiPromise, timeoutPromise]);
+      clearTimeout(timeoutId!);
+
       const text = response.text || "[]";
       const parsed = JSON.parse(text);
       if (Array.isArray(parsed)) {
@@ -379,7 +388,7 @@ app.post("/api/live-concerts/sync", async (req, res) => {
         isFallback = true;
       }
     } catch (error: any) {
-      console.warn("Gemini Live Concert Update failed (likely quota/rate limit error). Bypassing with highly accurate real 2026/2027 fallback database.", error.message || error);
+      console.warn("Gemini Live Concert Update failed or timed out. Bypassing with highly accurate real 2026/2027 fallback database. Error:", error.message || error);
       concerts = REAL_CONCERTS_FALLBACK;
       isFallback = true;
     }

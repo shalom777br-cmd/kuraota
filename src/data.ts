@@ -109,9 +109,9 @@ export const INITIAL_COMPOSERS: Composer[] = [
 
 export const INITIAL_CONCERTS: UpcomingConcert[] = [
   {
-    id: "suntory-vienna-2026",
-    title: "ウィーン・フィルハーモニー管弦楽団来日公演（サントリーホール・フェスティバル）",
-    composer: "W.A.モーツァルト / アントン・ブルックナー",
+    id: "suntory-vienna-thielemann-20261108",
+    title: "ウィーン・フィルハーモニー管弦楽団 来日公演 2026",
+    composer: "モーツァルト / ブルックナー",
     program: "モーツァルト：交響曲 第41番 ハ長調 K.551『ジュピター』、ブルックナー：交響曲 第7番 ホ長調（ノーヴァク版）",
     performer: "ウィーン・フィルハーモニー管弦楽団 / 指揮: クリスティアン・ティーレマン",
     venue: "サントリーホール 大ホール",
@@ -124,7 +124,7 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     ticketLink: "https://www.suntory.co.jp/suntoryhall/"
   },
   {
-    id: "nhkhall-nhkso-2026",
+    id: "nhkhall-nhkso-luisi-20260912",
     title: "NHK交響楽団 定期演奏会（第2015回 定期公演 Aプログラム）",
     composer: "グスタフ・マーラー",
     program: "マーラー：交響曲 第2番 ハ短調『復活』",
@@ -139,7 +139,7 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     ticketLink: "https://www.nhkso.or.jp/"
   },
   {
-    id: "suntory-yomikyo-2026",
+    id: "suntory-yomikyo-weigle-20260908",
     title: "読売日本交響楽団 第662回 定期演奏会",
     composer: "ヨハネス・ブラームス",
     program: "ブラームス：ピアノ協奏曲 第2番 変ロ長調 Op.83、ブラームス：交響曲 第2番 ニ長調 Op.73",
@@ -154,10 +154,10 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     ticketLink: "https://yomikyo.or.jp/"
   },
   {
-    id: "suntory-tso-2026",
+    id: "suntory-tso-nott-20261017",
     title: "東京交響楽団 第744回 定期演奏会",
     composer: "リゲティ / ベルク / ベートーヴェン",
-    program: "リゲティ：サンフランシスコ・ポリフォニー、ベルク：ヴァイオリン協奏曲『ある天使の思い出に』、ベートーヴェン：交響曲 第3番 ヘ長調『英雄』",
+    program: "リゲティ：サンフランシスコ・ポリフォニー、ベルク：ヴァイオリン協奏曲『ある天使 of 思い出に』、ベートーヴェン：交響曲 第3番 ヘ長調『英雄』",
     performer: "東京交響楽団 / 指揮: ジョナサン・ノット / ヴァイオリン: イザベル・ファウスト",
     venue: "サントリーホール 大ホール",
     date: "2026-10-17",
@@ -169,7 +169,7 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     ticketLink: "https://tokyosymphony.jp/"
   },
   {
-    id: "sumida-triphony-2026",
+    id: "sumida-triphony-kamioka-20261024",
     title: "新日本フィルハーモニー交響楽団 第672回 定期演奏会",
     composer: "リヒャルト・ワーグナー",
     program: "ワーグナー（ロリン・マゼール編曲）：楽劇『ニーベルングの指環』～言葉のない指環",
@@ -184,7 +184,7 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     ticketLink: "https://www.njp.or.jp/"
   },
   {
-    id: "operacity-organ-2026",
+    id: "operacity-organ-suzuki-20261018",
     title: "東京オペラシティ 荘厳なるパイプオルガンとバッハの宇宙",
     composer: "ヨハン・ゼバスティアン・バッハ",
     program: "J.S.バッハ：トッカータとフーガ ニ短調 BWV 565、シューブラー・コラール集より、小フーガ ト短調 BWV 578、パスサカリア ハ短調 BWV 582",
@@ -199,7 +199,7 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     ticketLink: "https://www.operacity.jp/"
   },
   {
-    id: "hamarikyu-quartet-2026",
+    id: "hamarikyu-quartet-amabile-20261002",
     title: "浜離宮室内楽セレクション：カルテット・アマービレ 弦楽四重奏リサイタル",
     composer: "ルートヴィヒ・ヴァン・ベートーヴェン / ヨハネス・ブラームス",
     program: "ベートーヴェン：弦楽四重奏曲 第11番 ヘ短調 Op.95『セリオーソ』、ブラームス：弦楽四重奏曲 第1番 ハ短調 Op.51-1",
@@ -214,7 +214,7 @@ export const INITIAL_CONCERTS: UpcomingConcert[] = [
     ticketLink: "https://www.asahi-hall.jp/hamarikyu/"
   },
   {
-    id: "persimmon-chopin-2026",
+    id: "persimmon-chopin-sorita-20260829",
     title: "パーシモン・プレミアム・クラシックス：反田恭平 ピアノ・リサイタル",
     composer: "フレデリック・ショパン",
     program: "ショパン：ノクターン 第20番 嬰ハ短調（遺作）、マズルカ風ロンド Op.5、24の前奏曲 Op.28（全曲）、英雄ポロネーズ Op.53",
