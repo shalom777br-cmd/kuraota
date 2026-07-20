@@ -48,58 +48,69 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
 
       const executeSync = async () => {
-        // Step 1: Retrieve grounded text with search tools (no responseSchema or responseMimeType)
-        const firstResponse = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: searchPrompt,
-          config: {
-            systemInstruction: searchSystemInstruction,
-            tools: [{ googleSearch: {} }]
-          }
-        });
+        let rawText = "";
+        try {
+          // Step 1: Retrieve grounded text with search tools (no responseSchema or responseMimeType)
+          const firstResponse = await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: searchPrompt,
+            config: {
+              systemInstruction: searchSystemInstruction,
+              tools: [{ googleSearch: {} }]
+            }
+          });
 
-        const rawText = firstResponse.text || "";
-        if (!rawText.trim()) {
-          throw new Error("No search results returned from Gemini Search.");
+          rawText = firstResponse.text || "";
+          if (!rawText.trim()) {
+            throw new Error("No search results returned from Gemini Search.");
+          }
+        } catch (error: any) {
+          console.error("STEP1 ERROR:", error.message || error, error);
+          throw error;
         }
 
-        // Step 2: Parse raw text into structured JSON array (no tools)
-        const parserSystemInstruction = `
-          You are "Concert Data Parser", an AI system that takes unstructured text describing real classical music concerts in Tokyo and parses them into a precise, valid JSON array matching the requested schema.
-          Extract every concert mentioned in the input text.
-          Return ONLY a valid JSON array of objects. Do not write markdown blocks other than the JSON itself.
-        `;
+        try {
+          // Step 2: Parse raw text into structured JSON array (no tools)
+          const parserSystemInstruction = `
+            You are "Concert Data Parser", an AI system that takes unstructured text describing real classical music concerts in Tokyo and parses them into a precise, valid JSON array matching the requested schema.
+            Extract every concert mentioned in the input text.
+            Return ONLY a valid JSON array of objects. Do not write markdown blocks other than the JSON itself.
+          `;
 
-        const secondResponse = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: `Parse the following text and convert it into a JSON array using the schema:\n\n${rawText}`,
-          config: {
-            systemInstruction: parserSystemInstruction,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  id: { type: Type.STRING, description: "A unique URL-friendly string id, e.g., 'suntory-nhkso-202611'" },
-                  title: { type: Type.STRING, description: "Concert title, in Japanese" },
-                  composer: { type: Type.STRING, description: "Name of the composers featured, in Japanese/English, e.g., 'マーラー / ワーグナー'" },
-                  program: { type: Type.STRING, description: "Full pieces/program listed, in Japanese, e.g., '交響曲第2番「復活」'" },
-                  performer: { type: Type.STRING, description: "Orchestra, soloist, conductor, in Japanese" },
-                  venue: { type: Type.STRING, description: "The exact name of the hall, e.g., 'サントリーホール 大ホール' or 'すみだトリフォニーホール 大ホール'" },
-                  date: { type: Type.STRING, description: "The performance date in YYYY-MM-DD format (e.g. '2026-10-24')" },
-                  time: { type: Type.STRING, description: "Start time, e.g. '14:00' or '19:00'" },
-                  description: { type: Type.STRING, description: "A beautifully written description of the concert, the background of the music and what to expect, in polite Japanese." },
-                  ticketLink: { type: Type.STRING, description: "A real link or the main official website of the venue." }
-                },
-                required: ["id", "title", "composer", "program", "performer", "venue", "date", "time", "description"]
+          const secondResponse = await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: `Parse the following text and convert it into a JSON array using the schema:\n\n${rawText}`,
+            config: {
+              systemInstruction: parserSystemInstruction,
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    id: { type: Type.STRING, description: "A unique URL-friendly string id, e.g., 'suntory-nhkso-202611'" },
+                    title: { type: Type.STRING, description: "Concert title, in Japanese" },
+                    composer: { type: Type.STRING, description: "Name of the composers featured, in Japanese/English, e.g., 'マーラー / ワーグナー'" },
+                    program: { type: Type.STRING, description: "Full pieces/program listed, in Japanese, e.g., '交響曲第2番「復活」'" },
+                    performer: { type: Type.STRING, description: "Orchestra, soloist, conductor, in Japanese" },
+                    venue: { type: Type.STRING, description: "The exact name of the hall, e.g., 'サントリーホール 大ホール' or 'すみだトリフォニーホール 大ホール'" },
+                    date: { type: Type.STRING, description: "The performance date in YYYY-MM-DD format (e.g. '2026-10-24')" },
+                    time: { type: Type.STRING, description: "Start time, e.g. '14:00' or '19:00'" },
+                    description: { type: Type.STRING, description: "A beautifully written description of the concert, the background of the music and what to expect, in polite Japanese." },
+                    ticketLink: { type: Type.STRING, description: "A real link or the main official website of the venue." }
+                  },
+                  required: ["id", "title", "composer", "program", "performer", "venue", "date", "time", "description"]
+                }
               }
             }
-          }
-        });
+          });
 
-        const jsonText = secondResponse.text || "[]";
-        return JSON.parse(jsonText);
+          const jsonText = secondResponse.text || "[]";
+          return JSON.parse(jsonText);
+        } catch (error: any) {
+          console.error("STEP2 ERROR:", error.message || error, error);
+          throw error;
+        }
       };
 
       const parsed = await Promise.race([executeSync(), timeoutPromise]);
